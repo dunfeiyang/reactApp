@@ -27,42 +27,177 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* 声明式开发
+* 可以与其他框架并存
+* 组件化
+* 单向数据流
+* 视图层框架
+* 函数式的编程
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## propTypes、defaultProps 默认值
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```
+class.propTypes = {
+    text: PropTypes.string
+}
 
-## Learn More
+class.defaultProps = {
+    text: 'dfy'
+}
+```
+## props、state、render
+> 当组件的props 或者 state 改变的时候，render函数就会重新执行
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+> 当父组件的render 函数执行时，子组件的render都会被重新执行
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 生命周期
+#### initalization
 
-### Code Splitting
+* setup props and state
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
 
-### Analyzing the Bundle Size
+#### Mounting
+*componentWillReceiveProps
+ > 当组件从父组件接受了参数
+ 
+ > 只要父组件的render函数重新执行了，子组件这个生命周期就会执行。++如果组件第一次存在父组件中，不会执行；组件之前存在于父组件中，才会会执行。++
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+* componentWillMount
+> 在组件即将被挂在到页面的时刻
 
-### Making a Progressive Web App
+* render
+> 组件挂载
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+* componentDidMount
+> 组件被挂载到页面之后
 
-### Advanced Configuration
+#### updation
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+* shouldComponentUpdate
+> 组件被更新之前, 返回boolean值。
 
-### Deployment
+* componentWillUpdate
+> 组件被更新之前，在shouldComponentUpdate之后，在shouldComponentUpdate之后返回==true==才执行。
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+* componentDidUpdate
+> 组件被更新后
 
-### `npm run build` fails to minify
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+#### unmounting
+* componentWillUnmount
+> 组件从页面移除时
+
+## 生命周期函数的使用
+
+#### 性能优化 
+
+
+```
+//bind只执行一次
+constructor(){
+    //...bind(this)
+}
+
+//避免子组件render
+shouldComponentUpdate(nextProps,nextState){
+    if(nextProps.content !== this.props.content){
+        return true
+    }else{
+        return false
+    }
+}
+
+
+```
+
+#### 其他生命周期函数的使用
+
+```
+//ajax的调用
+//只会被执行一次
+//比componentWillMount好
+//constructor也可以，建议在：
+componentDidMount(){
+    
+}
+
+```
+
+## Redux
+
+
+
+```
+                  <----
+Action---->Store       Reducer
+Creater       |    ---->
+              |
+             React
+             Components
+```
+
+
+ 
+```
+graph LR
+ReactComponents-->ActionCreators
+```
+
+ 
+```
+graph LR
+ActionCreators-->Store
+```
+      
+
+```
+sequenceDiagram
+Store->>Reducers: previosState,action
+Reducers->>Store: newState
+```
+      
+```
+graph LR
+Store-->ReactComponents
+```
+
+* store是唯一的
+* 只有store能改变自己的内容
+* Reducer必须是纯函数
+
+
+
+##### API
+* createStore
+* store.dispathch
+* store.getState
+* store.subscribe
+
+
+
+## redux-thunk
+action和store中间键
+
+对于dispatch升级可以接收一个函数作为参数
+这样就可以在action里使用axios,
+
+```
+//js
+store.dispatch(actions.getTodList())
+```
+
+ 
+```
+//actionCreators
+export const getTodList = () => {
+  return (dispatch) => {
+    axios.get('/mock/list.json').then(res => {
+      const data = res.data;
+      dispatch(initListAction(data))
+    })
+  }
+}
+```
+                   
